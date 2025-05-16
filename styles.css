@@ -1,0 +1,8 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #f9fafb, #e9ecef);
+}
+
+.container {
+  margin-top: 100px;
+}

@@ -1,29 +1,30 @@
-let auth0 = null;
+// auth.js
+import { createAuth0Client } from 'https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.esm.js';
 
-async function initAuth() {
-  auth0 = await createAuth0Client({
-    domain: "jaoulack.us.auth0.com",
-    client_id: "UaJ9AFYht41MRwp4p1jz9Kn92D3FihbL",
-    cacheLocation: "localstorage",
-    useRefreshTokens: true
-  });
-
-  const query = window.location.search;
-  if (query.includes("code=") && query.includes("state=")) {
-    await auth0.handleRedirectCallback();
-    window.history.replaceState({}, document.title, window.location.pathname);
+const auth0 = await createAuth0Client({
+  domain: "jaoulack.us.auth0.com", // <-- substitua
+  clientId: "UaJ9AFYht41MRwp4p1jz9Kn92D3FihbL",       // <-- substitua
+  authorizationParams: {
+    redirect_uri: "https://pedrojaoulack.github.io/Rosetta_Stone/dashboard.html"
   }
+});
+
+const loginBtn = document.getElementById("btn-login");
+const logoutBtn = document.getElementById("btn-logout");
+
+if (loginBtn) {
+  loginBtn.addEventListener("click", () => auth0.loginWithRedirect());
 }
 
-async function login() {
-  await initAuth();
-  await auth0.loginWithRedirect({
-    redirect_uri: window.location.origin + "/meu-site/dashboard.html"
-  });
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", () =>
+    auth0.logout({ returnTo: "https://pedrojaoulack.github.io/Rosetta_Stone/" })
+  );
 }
 
-async function logout() {
-  await auth0.logout({
-    returnTo: window.location.origin + "/meu-site/"
-  });
+if (window.location.pathname.endsWith("dashboard.html")) {
+  const isAuthenticated = await auth0.isAuthenticated();
+  if (!isAuthenticated) {
+    await auth0.loginWithRedirect();
+  }
 }
